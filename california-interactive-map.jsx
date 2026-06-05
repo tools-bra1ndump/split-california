@@ -577,49 +577,64 @@ export default function DivideCalifornia() {
             );
           })}
 
-          <div
-            className="no-print"
-            style={{ marginTop: 24, display: "flex", gap: 8 }}
+        </div>
+      </div>
+
+      <div
+        className="no-print"
+        style={{
+          marginTop: 28,
+          width: "min(620px, 86vw)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "stretch",
+          gap: 8,
+        }}
+      >
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={exportSVG}
+            style={{
+              flex: 1,
+              padding: "10px 14px",
+              background: ink,
+              color: "#fff",
+              border: "none",
+              fontSize: 13,
+              fontWeight: 600,
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              cursor: "pointer",
+            }}
           >
-            <button
-              onClick={exportSVG}
-              style={{
-                flex: 1,
-                padding: "10px 14px",
-                background: ink,
-                color: "#fff",
-                border: "none",
-                fontSize: 13,
-                fontWeight: 600,
-                fontFamily: "'IBM Plex Sans', sans-serif",
-                cursor: "pointer",
-              }}
-            >
-              Download SVG
-            </button>
-            <button
-              onClick={exportPNG}
-              style={{
-                flex: 1,
-                padding: "10px 14px",
-                background: "transparent",
-                color: ink,
-                border: `1px solid ${ink}`,
-                fontSize: 13,
-                fontWeight: 600,
-                fontFamily: "'IBM Plex Sans', sans-serif",
-                cursor: "pointer",
-              }}
-            >
-              Download PNG
-            </button>
-          </div>
-          <div
-            className="no-print"
-            style={{ marginTop: 8, fontSize: 11, color: muted, lineHeight: 1.5 }}
+            Download SVG
+          </button>
+          <button
+            onClick={exportPNG}
+            style={{
+              flex: 1,
+              padding: "10px 14px",
+              background: "transparent",
+              color: ink,
+              border: `1px solid ${ink}`,
+              fontSize: 13,
+              fontWeight: 600,
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              cursor: "pointer",
+            }}
           >
-            SVG is vector. PNG is high-res 3x.
-          </div>
+            Download PNG
+          </button>
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            color: muted,
+            lineHeight: 1.5,
+            textAlign: "center",
+          }}
+        >
+          SVG is vector (best for print: open the SVG, print, then Save as PDF).
+          PNG is high-res 3x.
         </div>
       </div>
     </div>

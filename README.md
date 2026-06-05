@@ -2,5 +2,13 @@
 
 Static GitHub Pages site for the "Divide California" and "Two Californias" map.
 
-- `index.html` is the deployed standalone page.
-- `california-interactive-map.jsx` is the React component version kept as source/reference.
+- `california-interactive-map.jsx` is the React map component.
+- `src/main.jsx` mounts the component.
+- `docs/` is the built GitHub Pages output.
+
+Build locally:
+
+```sh
+npm install
+npm run build
+```
