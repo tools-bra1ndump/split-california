@@ -28,22 +28,23 @@ const SCENARIOS = {
       },
       east: {
         label: "East California",
-        color: "#1B9AAA",
+        color: "#F28C28",
         capital: { name: "Sacramento", coords: [-121.494, 38.582] },
         counties: [
-          "Marin", "Contra Costa", "San Francisco", "San Mateo", "Alameda",
-          "Santa Clara", "Santa Cruz", "Sacramento", "San Benito",
-          "San Luis Obispo", "Santa Barbara", "Ventura", "Los Angeles",
+          "Sacramento", "Calaveras", "Tuolumne", "San Joaquin", "Stanislaus",
+          "Mariposa", "Mono", "Merced", "Madera", "Fresno", "Inyo", "Kings",
+          "Tulare", "Kern", "San Bernardino", "Orange", "Riverside",
+          "San Diego", "Imperial",
         ],
       },
       west: {
         label: "West California",
-        color: "#F28C28",
+        color: "#1B9AAA",
         capital: { name: "Monterey", coords: [-121.895, 36.600] },
         counties: [
-          "Calaveras", "Tuolumne", "San Joaquin", "Stanislaus", "Mariposa",
-          "Mono", "Merced", "Madera", "Fresno", "Inyo", "Kings", "Tulare", "Monterey",
-          "Kern", "San Bernardino", "Orange", "Riverside", "San Diego", "Imperial",
+          "Marin", "Contra Costa", "San Francisco", "San Mateo", "Alameda",
+          "Santa Clara", "Santa Cruz", "San Benito", "Monterey",
+          "San Luis Obispo", "Santa Barbara", "Ventura", "Los Angeles",
         ],
       },
     },
@@ -656,6 +657,56 @@ export default function DivideCalifornia() {
         >
           SVG is vector (best for print: open the SVG, print, then Save as PDF).
           PNG is high-res 3x.
+        </div>
+        <div
+          style={{
+            borderTop: "1px solid #d8d2c2",
+            color: muted,
+            fontSize: 11,
+            lineHeight: 1.6,
+            marginTop: 10,
+            paddingTop: 10,
+            textAlign: "left",
+          }}
+        >
+          <div style={{ color: ink, fontWeight: 700, marginBottom: 2 }}>
+            Data sources
+          </div>
+          <div>
+            Boundaries and county names:{" "}
+            <a
+              href="https://github.com/topojson/us-atlas"
+              rel="noreferrer"
+              target="_blank"
+              style={{ color: ink }}
+            >
+              topojson/us-atlas counties-10m
+            </a>
+            , derived from U.S. Census Bureau cartographic county boundary
+            files. Current Census boundary files:{" "}
+            <a
+              href="https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html"
+              rel="noreferrer"
+              target="_blank"
+              style={{ color: ink }}
+            >
+              census.gov cartographic boundary files
+            </a>
+            .
+          </div>
+          <div>
+            Population estimates:{" "}
+            <a
+              href="https://dof.ca.gov/forecasting/demographics/estimates-e1/"
+              rel="noreferrer"
+              target="_blank"
+              style={{ color: ink }}
+            >
+              California Department of Finance E-1 city/county/state
+              population estimates
+            </a>
+            ; values shown are rounded county estimates.
+          </div>
         </div>
       </div>
     </div>
