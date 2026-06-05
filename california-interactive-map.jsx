@@ -22,8 +22,7 @@ const SCENARIOS = {
         counties: [
           "Del Norte", "Siskiyou", "Modoc", "Humboldt", "Trinity", "Shasta",
           "Lassen", "Tehama", "Plumas", "Mendocino", "Glenn", "Butte", "Sierra",
-          "Lake", "Colusa", "Sutter", "Nevada", "Yuba", "Placer", "Yolo",
-          "El Dorado", "Napa", "Sonoma", "Sacramento", "Solano", "Amador", "Alpine",
+          "Lake", "Colusa", "Sutter", "Nevada", "Yuba", "Placer", "El Dorado",
         ],
       },
       east: {
@@ -41,9 +40,10 @@ const SCENARIOS = {
         color: "#F28C28",
         capital: { name: "Monterey", coords: [-121.895, 36.600] },
         counties: [
-          "San Joaquin", "Calaveras", "Tuolumne", "Stanislaus", "Mariposa",
-          "Mono", "Merced", "Madera", "Fresno", "Inyo", "Kings", "Tulare",
-          "Kern", "San Bernardino", "Orange", "Riverside", "San Diego", "Imperial",
+          "Sonoma", "Napa", "Yolo", "Solano", "Sacramento", "Amador", "Alpine",
+          "San Joaquin", "Calaveras", "Tuolumne", "Stanislaus", "Mariposa", "Mono",
+          "Merced", "Madera", "Fresno", "Inyo", "Kings", "Tulare", "Kern",
+          "San Bernardino", "Orange", "Riverside", "San Diego", "Imperial",
         ],
       },
     },
