@@ -287,6 +287,19 @@ export default function DivideCalifornia() {
       .attr("stroke", "#fff")
       .attr("stroke-width", 1.4);
 
+    capGroup.append("text")
+      .attr("class", "capital-name")
+      .attr("x", 7)
+      .attr("y", -5)
+      .attr("font-size", 8.5)
+      .attr("font-weight", 700)
+      .attr("font-family", "'IBM Plex Sans', Arial, sans-serif")
+      .attr("fill", "#1a1a1a")
+      .attr("paint-order", "stroke")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 3)
+      .text((c) => c.name);
+
     const legend = svg
       .append("g")
       .attr("class", "svg-map-legend")
