@@ -26,7 +26,7 @@ const SCENARIOS = {
         ],
       },
       east: {
-        label: "East California",
+        label: "West California",
         color: "#1B9AAA",
         capital: { name: "Monterey", coords: [-121.895, 36.600] },
         counties: [
@@ -36,7 +36,7 @@ const SCENARIOS = {
         ],
       },
       west: {
-        label: "West California",
+        label: "East California",
         color: "#F28C28",
         capital: { name: "Sacramento", coords: [-121.494, 38.582] },
         counties: [
