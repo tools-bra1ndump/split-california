@@ -119,6 +119,30 @@ const EXPORT_HEIGHT = 780;
 const LEGEND_X = 480;
 const LEGEND_Y = 26;
 
+function collectArcIndexes(geom, indexes) {
+  if (geom.type === "Polygon") {
+    geom.arcs.flat().forEach((i) => indexes.add(i < 0 ? ~i : i));
+    return;
+  }
+  if (geom.type === "MultiPolygon") {
+    geom.arcs.flat(2).forEach((i) => indexes.add(i < 0 ? ~i : i));
+  }
+}
+
+function arcMeshFeature(topology, geometries) {
+  const indexes = new Set();
+  geometries.forEach((geom) => collectArcIndexes(geom, indexes));
+  return {
+    type: "Feature",
+    geometry: {
+      type: "MultiLineString",
+      coordinates: [...indexes].map((i) =>
+        topology._decodedArcs[i].map((point) => point.slice())
+      ),
+    },
+  };
+}
+
 function topoFeature(topology, o) {
   if (o.type === "GeometryCollection") {
     return {
@@ -189,6 +213,7 @@ function object(topology, o) {
 export default function DivideCalifornia() {
   const svgRef = useRef(null);
   const [geographies, setGeographies] = useState(null);
+  const [boundaryGeography, setBoundaryGeography] = useState(null);
   const [error, setError] = useState(null);
   const [scenarioKey, setScenarioKey] = useState("three");
   const [hovered, setHovered] = useState(null);
@@ -207,9 +232,15 @@ export default function DivideCalifornia() {
       try {
         const topology = await d3.json(GEO_URL);
         topology._decodedArcs = decodeArcs(topology);
+        const caGeometries = topology.objects.counties.geometries.filter((g) =>
+          String(g.id).startsWith("06")
+        );
         const counties = topoFeature(topology, topology.objects.counties).features;
         const ca = counties.filter((f) => String(f.id).startsWith("06"));
-        if (!cancelled) setGeographies(ca);
+        if (!cancelled) {
+          setGeographies(ca);
+          setBoundaryGeography(arcMeshFeature(topology, caGeometries));
+        }
       } catch (e) {
         if (!cancelled) setError(e.message);
       }
@@ -220,7 +251,7 @@ export default function DivideCalifornia() {
   useEffect(() => { setSelectedCounty(null); }, [scenarioKey]);
 
   useEffect(() => {
-    if (!geographies || !svgRef.current) return;
+    if (!geographies || !boundaryGeography || !svgRef.current) return;
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
@@ -230,6 +261,7 @@ export default function DivideCalifornia() {
     const path = d3.geoPath().projection(projection);
 
     const gFill = svg.append("g");
+    const gBoundary = svg.append("g").attr("pointer-events", "none");
     svg.append("g").attr("class", "highlight-layer").attr("pointer-events", "none");
     const gLabel = svg.append("g").attr("pointer-events", "none");
     const gCapital = svg
@@ -245,8 +277,7 @@ export default function DivideCalifornia() {
         const region = countyToRegion[d.properties.name];
         return region ? scenario.regions[region].color : "#dcd8cc";
       })
-      .attr("stroke", "#ffffff")
-      .attr("stroke-width", 0.6)
+      .attr("stroke", "none")
       .attr("cursor", "pointer")
       .attr("data-county", (d) => d.properties.name)
       .on("mouseenter", function (event, d) {
@@ -258,6 +289,17 @@ export default function DivideCalifornia() {
       .on("click", function (event, d) {
         setSelectedCounty(d.properties.name);
       });
+
+    gBoundary
+      .append("path")
+      .datum(boundaryGeography)
+      .attr("d", path)
+      .attr("fill", "none")
+      .attr("stroke", "#ffffff")
+      .attr("stroke-width", 0.7)
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("vector-effect", "non-scaling-stroke");
 
     gLabel.selectAll("text")
       .data(geographies)
@@ -349,7 +391,7 @@ export default function DivideCalifornia() {
       .attr("font-weight", 600)
       .attr("fill", "#6f6a5b")
       .text((d) => `Capital  ${d.capital.name}`);
-  }, [geographies, scenarioKey]);
+  }, [boundaryGeography, geographies, scenarioKey]);
 
   useEffect(() => {
     if (!svgRef.current || !geographies) return;
@@ -387,8 +429,8 @@ export default function DivideCalifornia() {
       )
       .attr("d", (d) => path(d.feature))
       .attr("stroke", "#1a1a1a")
-      .attr("stroke-width", (d) => (d.kind === "selected" ? 1.35 : 0.95))
-      .attr("stroke-opacity", (d) => (d.kind === "selected" ? 1 : 0.75));
+      .attr("stroke-width", (d) => (d.kind === "selected" ? 0.95 : 0.75))
+      .attr("stroke-opacity", (d) => (d.kind === "selected" ? 1 : 0.82));
   }, [geographies, hovered, selectedCounty, scenarioKey]);
 
   function buildExportSVG() {
