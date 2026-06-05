@@ -53,13 +53,13 @@ const SCENARIOS = {
     title: "Two Californias",
     regions: {
       north: {
-        label: "North California",
+        label: "Northern California",
         color: "#27AAB8",
         capital: { name: "Sacramento", coords: [-121.494, 38.582] },
         counties: NORTH_SET,
       },
       south: {
-        label: "South California",
+        label: "Southern California",
         color: "#E03131",
         capital: { name: "San Bernardino", coords: [-117.290, 34.108] },
         counties: [
@@ -114,7 +114,8 @@ const GEO_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json";
 const MAP_WIDTH = 620;
 const SVG_WIDTH = 720;
 const MAP_HEIGHT = 720;
-const EXPORT_HEIGHT = 760;
+const EXPORT_TOP_OFFSET = 44;
+const EXPORT_HEIGHT = 780;
 const LEGEND_X = 480;
 const LEGEND_Y = 26;
 
@@ -288,6 +289,19 @@ export default function DivideCalifornia() {
       .attr("stroke-width", 1.4);
 
     capGroup.append("text")
+      .attr("class", "capital-name-halo")
+      .attr("x", 7)
+      .attr("y", -5)
+      .attr("font-size", 8.5)
+      .attr("font-weight", 700)
+      .attr("font-family", "'IBM Plex Sans', Arial, sans-serif")
+      .attr("fill", "none")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 3)
+      .attr("stroke-linejoin", "round")
+      .text((c) => c.name);
+
+    capGroup.append("text")
       .attr("class", "capital-name")
       .attr("x", 7)
       .attr("y", -5)
@@ -295,9 +309,7 @@ export default function DivideCalifornia() {
       .attr("font-weight", 700)
       .attr("font-family", "'IBM Plex Sans', Arial, sans-serif")
       .attr("fill", "#1a1a1a")
-      .attr("paint-order", "stroke")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 3)
+      .attr("stroke", "none")
       .text((c) => c.name);
 
     const legend = svg
@@ -387,16 +399,23 @@ export default function DivideCalifornia() {
     clone.setAttribute("width", String(SVG_WIDTH));
     clone.setAttribute("height", String(EXPORT_HEIGHT));
     clone.setAttribute("viewBox", `0 0 ${SVG_WIDTH} ${EXPORT_HEIGHT}`);
+
+    const content = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    content.setAttribute("transform", `translate(0,${EXPORT_TOP_OFFSET})`);
+    while (clone.firstChild) content.appendChild(clone.firstChild);
+
     const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     bg.setAttribute("x", "0");
     bg.setAttribute("y", "0");
     bg.setAttribute("width", String(SVG_WIDTH));
     bg.setAttribute("height", String(EXPORT_HEIGHT));
     bg.setAttribute("fill", "#ffffff");
-    clone.insertBefore(bg, clone.firstChild);
+    clone.appendChild(bg);
+    clone.appendChild(content);
+
     const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
     t.setAttribute("x", String(SVG_WIDTH / 2));
-    t.setAttribute("y", String(EXPORT_HEIGHT - 15));
+    t.setAttribute("y", "29");
     t.setAttribute("text-anchor", "middle");
     t.setAttribute("font-size", "20");
     t.setAttribute("font-weight", "900");
