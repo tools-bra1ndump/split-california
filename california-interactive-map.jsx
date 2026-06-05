@@ -327,7 +327,7 @@ export default function DivideCalifornia() {
       )
       .attr("d", (d) => path(d.feature))
       .attr("stroke", "#1a1a1a")
-      .attr("stroke-width", (d) => (d.kind === "selected" ? 2.2 : 1.3))
+      .attr("stroke-width", (d) => (d.kind === "selected" ? 1.35 : 0.95))
       .attr("stroke-opacity", (d) => (d.kind === "selected" ? 1 : 0.75));
   }, [geographies, hovered, selectedCounty, scenarioKey]);
 
@@ -495,10 +495,14 @@ export default function DivideCalifornia() {
           <svg
             ref={svgRef}
             viewBox="0 0 620 720"
+            tabIndex={-1}
             style={{
               width: "min(620px, 86vw)",
               height: "auto",
               display: geographies ? "block" : "none",
+              outline: "none",
+              WebkitTapHighlightColor: "transparent",
+              userSelect: "none",
             }}
           />
           <div
