@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>California Map - SVG Export</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: #f4f1e8;
+    color: #1a1a1a;
+    padding: 28px 16px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .toggle {
+    display: inline-flex;
+    border: 1px solid #1a1a1a;
+    margin-bottom: 18px;
+  }
+  .toggle button {
+    padding: 9px 20px; border: none; background: transparent;
+    color: #1a1a1a; font-size: 13px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+  }
+  .toggle button.active { background: #1a1a1a; color: #fff; }
+  h1 {
+    font-family: 'Fraunces', serif; font-weight: 900;
+    font-size: clamp(26px, 5vw, 40px); margin: 0 0 18px;
+    letter-spacing: 0;
+  }
+  .actions { display: flex; gap: 8px; margin-bottom: 20px; }
+  .actions button {
+    padding: 10px 18px; font-size: 13px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+  }
+  .btn-solid { background: #1a1a1a; color: #fff; border: none; }
+  .btn-outline { background: transparent; color: #1a1a1a; border: 1px solid #1a1a1a; }
+  #map { width: min(620px, 90vw); height: auto; }
+  .hint { font-size: 12px; color: #8a8472; margin-top: 4px; max-width: 480px; text-align: center; }
+  .status { color: #8a8472; padding: 40px; }
+  .error { color: #b00; padding: 30px; max-width: 380px; }
+</style>
+</head>
+<body>
+  <div class="toggle" id="toggle"></div>
+  <h1 id="title">Divide California</h1>
+  <div class="actions">
+    <button class="btn-solid" id="dl-svg">Download SVG</button>
+    <button class="btn-outline" id="dl-png">Download PNG (3x)</button>
+  </div>
+  <div class="hint">SVG is true vector - open it in a browser and print to "Save as PDF" for a high-quality PDF.</div>
+  <div id="container"><div class="status">Loading map...</div></div>
+
+<script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as topojson from "https://cdn.jsdelivr.net/npm/topojson-client@3/+esm";
+
+const NORTH_SET = [
+  "Del Norte","Siskiyou","Modoc","Humboldt","Trinity","Shasta","Lassen",
+  "Tehama","Plumas","Mendocino","Glenn","Butte","Sierra","Lake","Colusa",
+  "Sutter","Nevada","Yuba","Placer","Yolo","El Dorado","Napa","Sonoma",
+  "Sacramento","Solano","Amador","Alpine","Marin","Contra Costa",
+  "San Francisco","San Mateo","Alameda","Santa Clara","Santa Cruz",
+  "San Joaquin","Stanislaus","Calaveras","Tuolumne","Mariposa","Merced",
+  "Madera","Fresno","San Benito","Monterey","Kings","Tulare",
+];
+
+const SCENARIOS = {
+  three: {
+    title: "Divide California",
+    regions: {
+      jefferson: { label:"State of Jefferson", color:"#F2C200",
+        capital:{name:"Yreka", coords:[-122.634,41.726]},
+        counties:["Del Norte","Siskiyou","Modoc","Humboldt","Trinity","Shasta","Lassen","Tehama","Plumas","Mendocino","Glenn","Butte","Sierra","Lake","Colusa","Sutter","Nevada","Yuba","Placer","Yolo","El Dorado","Napa","Sonoma","Sacramento","Solano","Amador","Alpine"] },
+      east: { label:"East California", color:"#1B9AAA",
+        capital:{name:"Sacramento", coords:[-121.494,38.582]},
+        counties:["Marin","Contra Costa","San Francisco","San Mateo","Alameda","Santa Clara","Santa Cruz","San Benito","Monterey","San Luis Obispo","Santa Barbara","Ventura","Los Angeles"] },
+      west: { label:"West California", color:"#F28C28",
+        capital:{name:"Monterey", coords:[-121.895,36.600]},
+        counties:["Calaveras","Tuolumne","San Joaquin","Stanislaus","Mariposa","Mono","Merced","Madera","Fresno","Inyo","Kings","Tulare","Kern","San Bernardino","Orange","Riverside","San Diego","Imperial"] },
+    },
+  },
+  two: {
+    title: "Two Californias",
+    regions: {
+      north: { label:"North California", color:"#27AAB8",
+        capital:{name:"Sacramento", coords:[-121.494,38.582]},
+        counties: NORTH_SET },
+      south: { label:"South California", color:"#E03131",
+        capital:{name:"San Bernardino", coords:[-117.290,34.108]},
+        counties:["Mono","Inyo","San Luis Obispo","Kern","Santa Barbara","Ventura","Los Angeles","San Bernardino","Orange","Riverside","San Diego","Imperial"] },
+    },
+  },
+};
+
+const GEO_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json";
+const W = 620, H = 720;
+let geographies = null;
+let scenarioKey = "three";
+
+function regionOf(scenario, name) {
+  for (const [k, r] of Object.entries(scenario.regions)) {
+    if (r.counties.includes(name)) return k;
+  }
+  return null;
+}
+
+function buildSVG({ forExport = false } = {}) {
+  const scenario = SCENARIOS[scenarioKey];
+  const height = forExport ? H + 40 : H;
+  const svg = d3.create("svg")
+    .attr("xmlns", "http://www.w3.org/2000/svg")
+    .attr("viewBox", `0 0 ${W} ${height}`)
+    .attr("width", W)
+    .attr("height", height);
+
+  if (forExport) {
+    svg.append("rect").attr("width", W).attr("height", height).attr("fill", "#ffffff");
+  }
+
+  const projection = d3.geoMercator().fitSize([W, H], {
+    type: "FeatureCollection", features: geographies,
+  });
+  const path = d3.geoPath().projection(projection);
+
+  const gFill = svg.append("g");
+  const gLabel = svg.append("g");
+  const gCap = svg.append("g");
+
+  gFill.selectAll("path")
+    .data(geographies).join("path")
+    .attr("d", path)
+    .attr("fill", d => {
+      const k = regionOf(scenario, d.properties.name);
+      return k ? scenario.regions[k].color : "#dcd8cc";
+    })
+    .attr("stroke", "#ffffff").attr("stroke-width", 0.6);
+
+  gLabel.selectAll("text")
+    .data(geographies).join("text")
+    .attr("x", d => path.centroid(d)[0])
+    .attr("y", d => path.centroid(d)[1])
+    .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+    .attr("font-size", 6.2)
+    .attr("font-family", forExport ? "Arial, sans-serif" : "'IBM Plex Sans', sans-serif")
+    .attr("fill", "#23201a")
+    .text(d => d.properties.name.toUpperCase());
+
+  const caps = Object.values(scenario.regions).map(r => r.capital).filter(Boolean);
+  const cg = gCap.selectAll("g").data(caps).join("g")
+    .attr("transform", c => { const [x,y] = projection(c.coords); return `translate(${x},${y})`; });
+  cg.append("circle").attr("r", 4).attr("fill", "#1a1a1a").attr("stroke", "#fff").attr("stroke-width", 1.4);
+  cg.append("text").attr("y", -7).attr("text-anchor", "middle")
+    .attr("font-size", 8.5).attr("font-weight", 700)
+    .attr("font-family", forExport ? "Arial, sans-serif" : "'IBM Plex Sans', sans-serif")
+    .attr("fill", "#1a1a1a").attr("paint-order", "stroke")
+    .attr("stroke", "#fff").attr("stroke-width", 3)
+    .text(c => "* " + c.name);
+
+  if (forExport) {
+    svg.append("text")
+      .attr("x", W/2).attr("y", height - 14).attr("text-anchor", "middle")
+      .attr("font-size", 20).attr("font-weight", 900)
+      .attr("font-family", "Georgia, serif").attr("fill", "#1a1a1a")
+      .text(scenario.title);
+  }
+  return svg.node();
+}
+
+function render() {
+  const c = document.getElementById("container");
+  c.innerHTML = "";
+  const node = buildSVG();
+  node.id = "map";
+  c.appendChild(node);
+  document.getElementById("title").textContent = SCENARIOS[scenarioKey].title;
+  document.querySelectorAll("#toggle button").forEach(b => {
+    b.classList.toggle("active", b.dataset.key === scenarioKey);
+  });
+}
+
+function download(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportSVG() {
+  const node = buildSVG({ forExport: true });
+  const str = new XMLSerializer().serializeToString(node);
+  download(new Blob([str], { type: "image/svg+xml;charset=utf-8" }), `${scenarioKey}-california.svg`);
+}
+
+function exportPNG() {
+  const node = buildSVG({ forExport: true });
+  const str = new XMLSerializer().serializeToString(node);
+  const blob = new Blob([str], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const s = 3, canvas = document.createElement("canvas");
+    canvas.width = W * s; canvas.height = (H + 40) * s;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#fff"; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(b => download(b, `${scenarioKey}-california.png`), "image/png");
+  };
+  img.src = url;
+}
+
+const tg = document.getElementById("toggle");
+for (const [k, s] of Object.entries(SCENARIOS)) {
+  const b = document.createElement("button");
+  b.textContent = s.title; b.dataset.key = k;
+  b.onclick = () => { scenarioKey = k; render(); };
+  tg.appendChild(b);
+}
+document.getElementById("dl-svg").onclick = exportSVG;
+document.getElementById("dl-png").onclick = exportPNG;
+
+try {
+  const topo = await d3.json(GEO_URL);
+  const counties = topojson.feature(topo, topo.objects.counties).features;
+  geographies = counties.filter(f => String(f.id).startsWith("06"));
+  render();
+} catch (e) {
+  document.getElementById("container").innerHTML =
+    `<div class="error">Couldn't load map data: ${e.message}. This page needs internet access to load county boundaries from the jsDelivr CDN.</div>`;
+}
+</script>
+</body>
+</html>
