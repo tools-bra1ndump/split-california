@@ -216,7 +216,6 @@ export default function DivideCalifornia() {
   const [boundaryGeography, setBoundaryGeography] = useState(null);
   const [error, setError] = useState(null);
   const [scenarioKey, setScenarioKey] = useState("three");
-  const [hovered, setHovered] = useState(null);
   const [selectedCounty, setSelectedCounty] = useState(null);
 
   const scenario = SCENARIOS[scenarioKey];
@@ -262,7 +261,6 @@ export default function DivideCalifornia() {
 
     const gFill = svg.append("g");
     const gBoundary = svg.append("g").attr("pointer-events", "none");
-    svg.append("g").attr("class", "highlight-layer").attr("pointer-events", "none");
     const gLabel = svg.append("g").attr("pointer-events", "none");
     const gCapital = svg
       .append("g")
@@ -280,12 +278,6 @@ export default function DivideCalifornia() {
       .attr("stroke", "none")
       .attr("cursor", "pointer")
       .attr("data-county", (d) => d.properties.name)
-      .on("mouseenter", function (event, d) {
-        setHovered(d.properties.name);
-      })
-      .on("mouseleave", function () {
-        setHovered(null);
-      })
       .on("click", function (event, d) {
         setSelectedCounty(d.properties.name);
       });
@@ -378,46 +370,6 @@ export default function DivideCalifornia() {
       .attr("fill", "#6f6a5b")
       .text((d) => `Capital  ${d.capital.name}`);
   }, [boundaryGeography, geographies, scenarioKey]);
-
-  useEffect(() => {
-    if (!svgRef.current || !geographies) return;
-    const projection = d3.geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], {
-      type: "FeatureCollection", features: geographies,
-    });
-    const path = d3.geoPath().projection(projection);
-    const findCounty = (name) =>
-      geographies.find((d) => d.properties.name === name);
-
-    const outlines = [
-      selectedCounty && { kind: "selected", feature: findCounty(selectedCounty) },
-      hovered &&
-        hovered !== selectedCounty && {
-          kind: "hovered",
-          feature: findCounty(hovered),
-        },
-    ].filter((outline) => outline && outline.feature);
-
-    d3.select(svgRef.current)
-      .select(".highlight-layer")
-      .selectAll("path")
-      .data(outlines, (d) => d.kind)
-      .join(
-        (enter) =>
-          enter
-            .append("path")
-            .attr("fill", "none")
-            .attr("pointer-events", "none")
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-linecap", "round")
-            .attr("vector-effect", "non-scaling-stroke"),
-        (update) => update,
-        (exit) => exit.remove()
-      )
-      .attr("d", (d) => path(d.feature))
-      .attr("stroke", "#1a1a1a")
-      .attr("stroke-width", (d) => (d.kind === "selected" ? 0.95 : 0.75))
-      .attr("stroke-opacity", (d) => (d.kind === "selected" ? 1 : 0.82));
-  }, [geographies, hovered, selectedCounty, scenarioKey]);
 
   function buildExportSVG() {
     const src = svgRef.current;
