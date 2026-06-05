@@ -327,27 +327,13 @@ export default function DivideCalifornia() {
       .attr("class", "capital-dot")
       .attr("r", 4)
       .attr("fill", "#1a1a1a")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1.4);
-
-    capGroup.append("text")
-      .attr("class", "capital-name-halo")
-      .attr("x", 7)
-      .attr("y", -5)
-      .attr("font-size", 8.5)
-      .attr("font-weight", 700)
-      .attr("font-family", "'IBM Plex Sans', Arial, sans-serif")
-      .attr("fill", "none")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 3)
-      .attr("stroke-linejoin", "round")
-      .text((c) => c.name);
+      .attr("stroke", "none");
 
     capGroup.append("text")
       .attr("class", "capital-name")
       .attr("x", 7)
       .attr("y", -5)
-      .attr("font-size", 8.5)
+      .attr("font-size", 7.8)
       .attr("font-weight", 700)
       .attr("font-family", "'IBM Plex Sans', Arial, sans-serif")
       .attr("fill", "#1a1a1a")
