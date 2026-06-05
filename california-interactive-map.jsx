@@ -23,7 +23,7 @@ const SCENARIOS = {
           "Del Norte", "Siskiyou", "Modoc", "Humboldt", "Trinity", "Shasta",
           "Lassen", "Tehama", "Plumas", "Mendocino", "Glenn", "Butte", "Sierra",
           "Lake", "Colusa", "Sutter", "Nevada", "Yuba", "Placer", "Yolo",
-          "El Dorado", "Napa", "Sonoma", "Sacramento", "Solano", "Amador", "Alpine",
+          "El Dorado", "Napa", "Sonoma", "Solano", "Amador", "Alpine",
         ],
       },
       east: {
@@ -32,7 +32,7 @@ const SCENARIOS = {
         capital: { name: "Sacramento", coords: [-121.494, 38.582] },
         counties: [
           "Marin", "Contra Costa", "San Francisco", "San Mateo", "Alameda",
-          "Santa Clara", "Santa Cruz", "San Benito", "Monterey",
+          "Santa Clara", "Santa Cruz", "Sacramento", "San Benito",
           "San Luis Obispo", "Santa Barbara", "Ventura", "Los Angeles",
         ],
       },
@@ -42,7 +42,7 @@ const SCENARIOS = {
         capital: { name: "Monterey", coords: [-121.895, 36.600] },
         counties: [
           "Calaveras", "Tuolumne", "San Joaquin", "Stanislaus", "Mariposa",
-          "Mono", "Merced", "Madera", "Fresno", "Inyo", "Kings", "Tulare",
+          "Mono", "Merced", "Madera", "Fresno", "Inyo", "Kings", "Tulare", "Monterey",
           "Kern", "San Bernardino", "Orange", "Riverside", "San Diego", "Imperial",
         ],
       },
