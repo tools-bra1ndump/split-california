@@ -7,7 +7,7 @@ const NORTH_SET = [
   "Sutter", "Nevada", "Yuba", "Placer", "Yolo", "El Dorado", "Napa", "Sonoma",
   "Sacramento", "Solano", "Amador", "Alpine", "Marin", "Contra Costa",
   "San Francisco", "San Mateo", "Alameda", "Santa Clara", "Santa Cruz",
-  "San Joaquin", "Stanislaus", "Calaveras", "Tuolumne", "Mariposa", "Merced",
+  "San Joaquin", "Stanislaus", "Calaveras", "Tuolumne", "Mariposa", "Mono", "Merced",
   "Madera", "Fresno", "San Benito", "Monterey", "Kings", "Tulare",
 ];
 
@@ -63,7 +63,7 @@ const SCENARIOS = {
         color: "#E03131",
         capital: { name: "San Bernardino", coords: [-117.290, 34.108] },
         counties: [
-          "Mono", "Inyo", "San Luis Obispo", "Kern", "Santa Barbara", "Ventura",
+          "Inyo", "San Luis Obispo", "Kern", "Santa Barbara", "Ventura",
           "Los Angeles", "San Bernardino", "Orange", "Riverside", "San Diego",
           "Imperial",
         ],
