@@ -231,7 +231,10 @@ export default function DivideCalifornia() {
     const gFill = svg.append("g");
     svg.append("g").attr("class", "highlight-layer").attr("pointer-events", "none");
     const gLabel = svg.append("g").attr("pointer-events", "none");
-    const gCapital = svg.append("g").attr("pointer-events", "none");
+    const gCapital = svg
+      .append("g")
+      .attr("class", "capital-layer")
+      .attr("pointer-events", "none");
 
     gFill.selectAll("path")
       .data(geographies)
@@ -278,21 +281,11 @@ export default function DivideCalifornia() {
         return `translate(${x},${y})`;
       });
     capGroup.append("circle")
+      .attr("class", "capital-dot")
       .attr("r", 4)
       .attr("fill", "#1a1a1a")
       .attr("stroke", "#fff")
       .attr("stroke-width", 1.4);
-    capGroup.append("text")
-      .attr("y", -7)
-      .attr("text-anchor", "middle")
-      .attr("font-size", 8.5)
-      .attr("font-weight", 700)
-      .attr("font-family", "'IBM Plex Sans', sans-serif")
-      .attr("fill", "#1a1a1a")
-      .attr("paint-order", "stroke")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 3)
-      .text((c) => "★ " + c.name);
 
     const legend = svg
       .append("g")
@@ -330,7 +323,7 @@ export default function DivideCalifornia() {
       .attr("font-size", 10.5)
       .attr("font-weight", 600)
       .attr("fill", "#6f6a5b")
-      .text((d) => `Capital  ★ ${d.capital.name}`);
+      .text((d) => `Capital  ${d.capital.name}`);
   }, [geographies, scenarioKey]);
 
   useEffect(() => {
