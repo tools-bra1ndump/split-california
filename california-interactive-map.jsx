@@ -111,6 +111,12 @@ function buildScenario(scenario) {
 }
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json";
+const MAP_WIDTH = 620;
+const SVG_WIDTH = 900;
+const MAP_HEIGHT = 720;
+const EXPORT_HEIGHT = 760;
+const LEGEND_X = 650;
+const LEGEND_Y = 28;
 
 function topoFeature(topology, o) {
   if (o.type === "GeometryCollection") {
@@ -188,7 +194,7 @@ export default function DivideCalifornia() {
   const [selectedCounty, setSelectedCounty] = useState(null);
 
   const scenario = SCENARIOS[scenarioKey];
-  const { countyToRegion, stats } = React.useMemo(
+  const { countyToRegion } = React.useMemo(
     () => buildScenario(scenario),
     [scenarioKey]
   );
@@ -214,11 +220,10 @@ export default function DivideCalifornia() {
 
   useEffect(() => {
     if (!geographies || !svgRef.current) return;
-    const width = 620, height = 720;
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const projection = d3.geoMercator().fitSize([width, height], {
+    const projection = d3.geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], {
       type: "FeatureCollection", features: geographies,
     });
     const path = d3.geoPath().projection(projection);
@@ -288,12 +293,49 @@ export default function DivideCalifornia() {
       .attr("stroke", "#fff")
       .attr("stroke-width", 3)
       .text((c) => "★ " + c.name);
+
+    const legend = svg
+      .append("g")
+      .attr("class", "svg-map-legend")
+      .attr("pointer-events", "none")
+      .attr("transform", `translate(${LEGEND_X},${LEGEND_Y})`);
+
+    const legendItems = legend
+      .selectAll("g")
+      .data(Object.values(scenario.regions))
+      .join("g")
+      .attr("transform", (d, i) => `translate(0,${i * 62})`);
+
+    legendItems
+      .append("rect")
+      .attr("width", 18)
+      .attr("height", 18)
+      .attr("fill", (d) => d.color);
+
+    legendItems
+      .append("text")
+      .attr("x", 28)
+      .attr("y", 13)
+      .attr("font-family", "'Fraunces', Georgia, serif")
+      .attr("font-size", 15)
+      .attr("font-weight", 600)
+      .attr("fill", "#1a1a1a")
+      .text((d) => d.label);
+
+    legendItems
+      .append("text")
+      .attr("x", 28)
+      .attr("y", 32)
+      .attr("font-family", "'IBM Plex Sans', Arial, sans-serif")
+      .attr("font-size", 10.5)
+      .attr("font-weight", 600)
+      .attr("fill", "#6f6a5b")
+      .text((d) => `Capital  ★ ${d.capital.name}`);
   }, [geographies, scenarioKey]);
 
   useEffect(() => {
     if (!svgRef.current || !geographies) return;
-    const width = 620, height = 720;
-    const projection = d3.geoMercator().fitSize([width, height], {
+    const projection = d3.geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], {
       type: "FeatureCollection", features: geographies,
     });
     const path = d3.geoPath().projection(projection);
@@ -336,19 +378,19 @@ export default function DivideCalifornia() {
     if (!src) return null;
     const clone = src.cloneNode(true);
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    clone.setAttribute("width", "620");
-    clone.setAttribute("height", "760");
-    clone.setAttribute("viewBox", "0 0 620 760");
+    clone.setAttribute("width", String(SVG_WIDTH));
+    clone.setAttribute("height", String(EXPORT_HEIGHT));
+    clone.setAttribute("viewBox", `0 0 ${SVG_WIDTH} ${EXPORT_HEIGHT}`);
     const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     bg.setAttribute("x", "0");
     bg.setAttribute("y", "0");
-    bg.setAttribute("width", "620");
-    bg.setAttribute("height", "760");
+    bg.setAttribute("width", String(SVG_WIDTH));
+    bg.setAttribute("height", String(EXPORT_HEIGHT));
     bg.setAttribute("fill", "#ffffff");
     clone.insertBefore(bg, clone.firstChild);
     const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    t.setAttribute("x", "310");
-    t.setAttribute("y", "745");
+    t.setAttribute("x", String(SVG_WIDTH / 2));
+    t.setAttribute("y", String(EXPORT_HEIGHT - 15));
     t.setAttribute("text-anchor", "middle");
     t.setAttribute("font-size", "20");
     t.setAttribute("font-weight", "900");
@@ -380,14 +422,14 @@ export default function DivideCalifornia() {
   function exportPNG() {
     const svgStr = buildExportSVG();
     if (!svgStr) return;
-    const scale = 3;
+      const scale = 3;
     const blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = 620 * scale;
-      canvas.height = 760 * scale;
+      canvas.width = SVG_WIDTH * scale;
+      canvas.height = EXPORT_HEIGHT * scale;
       const ctx = canvas.getContext("2d");
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -482,7 +524,7 @@ export default function DivideCalifornia() {
           width: "100%",
         }}
       >
-        <div style={{ position: "relative", flex: "0 1 620px" }}>
+        <div style={{ position: "relative", flex: "0 1 900px" }}>
           {error && (
             <div style={{ padding: 30, color: "#b00", maxWidth: 360 }}>
               Couldn't load map data: {error}. The artifact needs network access
@@ -494,10 +536,10 @@ export default function DivideCalifornia() {
           )}
           <svg
             ref={svgRef}
-            viewBox="0 0 620 720"
+            viewBox={`0 0 ${SVG_WIDTH} ${MAP_HEIGHT}`}
             tabIndex={-1}
             style={{
-              width: "min(620px, 86vw)",
+              width: "min(900px, 94vw)",
               height: "auto",
               display: geographies ? "block" : "none",
               outline: "none",
@@ -531,86 +573,13 @@ export default function DivideCalifornia() {
           </div>
         </div>
 
-        <div style={{ minWidth: 230, flex: "0 1 260px" }}>
-          {Object.entries(scenario.regions).map(([key, r]) => {
-            const dim = hovered && countyToRegion[hovered] !== key;
-            const active = selectedRegion === key;
-            return (
-              <div
-                key={key}
-                style={{
-                  marginBottom: 22,
-                  paddingLeft: 14,
-                  borderLeft: `3px solid ${active ? r.color : "transparent"}`,
-                  opacity: dim ? 0.4 : 1,
-                  transition: "opacity 0.2s, border-color 0.2s",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span
-                    style={{
-                      width: 26,
-                      height: 26,
-                      background: r.color,
-                      flexShrink: 0,
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontFamily: "'Fraunces', serif",
-                      fontWeight: 600,
-                      fontSize: 17,
-                      color: ink,
-                    }}
-                  >
-                    {r.label}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    marginTop: 8,
-                    fontSize: 12.5,
-                    color: muted,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  <div>
-                    Capital&nbsp;&nbsp;
-                    <span style={{ color: ink, fontWeight: 600 }}>
-                      ★ {r.capital.name}
-                    </span>
-                  </div>
-                  <div>
-                    Counties&nbsp;&nbsp;
-                    <span style={{ color: ink, fontWeight: 600 }}>
-                      {stats[key].count}
-                    </span>
-                  </div>
-                  <div>
-                    Population&nbsp;&nbsp;
-                    <span style={{ color: ink, fontWeight: 600 }}>
-                      {fmt(stats[key].pop)}
-                    </span>
-                  </div>
-                  <div>
-                    Largest&nbsp;&nbsp;
-                    <span style={{ color: ink, fontWeight: 600 }}>
-                      {stats[key].largest}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-        </div>
       </div>
 
       <div
         className="no-print"
         style={{
           marginTop: 28,
-          width: "min(620px, 86vw)",
+          width: "min(900px, 94vw)",
           display: "flex",
           flexDirection: "column",
           alignItems: "stretch",
