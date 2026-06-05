@@ -292,7 +292,7 @@ export default function DivideCalifornia() {
       .attr("paint-order", "stroke")
       .attr("stroke", "#fff")
       .attr("stroke-width", 3)
-      .text((c) => "* " + c.name);
+      .text((c) => "★ " + c.name);
   }, [geographies, scenarioKey]);
 
   useEffect(() => {
@@ -551,7 +551,7 @@ export default function DivideCalifornia() {
                   <div>
                     Capital&nbsp;&nbsp;
                     <span style={{ color: ink, fontWeight: 600 }}>
-                      * {r.capital.name}
+                      ★ {r.capital.name}
                     </span>
                   </div>
                   <div>

@@ -160,7 +160,7 @@ function buildSVG({ forExport = false } = {}) {
     .attr("font-family", forExport ? "Arial, sans-serif" : "'IBM Plex Sans', sans-serif")
     .attr("fill", "#1a1a1a").attr("paint-order", "stroke")
     .attr("stroke", "#fff").attr("stroke-width", 3)
-    .text(c => "* " + c.name);
+    .text(c => "★ " + c.name);
 
   if (forExport) {
     svg.append("text")
