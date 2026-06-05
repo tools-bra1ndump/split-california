@@ -112,11 +112,11 @@ function buildScenario(scenario) {
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json";
 const MAP_WIDTH = 620;
-const SVG_WIDTH = 900;
+const SVG_WIDTH = 720;
 const MAP_HEIGHT = 720;
 const EXPORT_HEIGHT = 760;
-const LEGEND_X = 650;
-const LEGEND_Y = 28;
+const LEGEND_X = 480;
+const LEGEND_Y = 26;
 
 function topoFeature(topology, o) {
   if (o.type === "GeometryCollection") {
@@ -524,7 +524,7 @@ export default function DivideCalifornia() {
           width: "100%",
         }}
       >
-        <div style={{ position: "relative", flex: "0 1 900px" }}>
+        <div style={{ position: "relative", flex: "0 1 720px" }}>
           {error && (
             <div style={{ padding: 30, color: "#b00", maxWidth: 360 }}>
               Couldn't load map data: {error}. The artifact needs network access
@@ -539,7 +539,7 @@ export default function DivideCalifornia() {
             viewBox={`0 0 ${SVG_WIDTH} ${MAP_HEIGHT}`}
             tabIndex={-1}
             style={{
-              width: "min(900px, 94vw)",
+              width: "min(720px, 94vw)",
               height: "auto",
               display: geographies ? "block" : "none",
               outline: "none",
@@ -579,7 +579,7 @@ export default function DivideCalifornia() {
         className="no-print"
         style={{
           marginTop: 28,
-          width: "min(900px, 94vw)",
+          width: "min(720px, 94vw)",
           display: "flex",
           flexDirection: "column",
           alignItems: "stretch",
