@@ -3,8 +3,10 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   base: "/split-california/",
+  root: "app",
   build: {
-    outDir: "docs",
+    emptyOutDir: false,
+    outDir: "..",
   },
   plugins: [react()],
 });
