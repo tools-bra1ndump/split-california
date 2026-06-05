@@ -260,6 +260,7 @@ export default function DivideCalifornia() {
 
     const gFill = svg.append("g");
     const gBoundary = svg.append("g").attr("pointer-events", "none");
+    svg.append("g").attr("class", "selected-layer").attr("pointer-events", "none");
     const gLabel = svg.append("g").attr("pointer-events", "none");
     const gCapital = svg
       .append("g")
@@ -369,6 +370,35 @@ export default function DivideCalifornia() {
       .attr("fill", "#6f6a5b")
       .text((d) => `Capital  ${d.capital.name}`);
   }, [boundaryGeography, geographies, scenarioKey]);
+
+  useEffect(() => {
+    if (!svgRef.current || !geographies) return;
+    const projection = d3.geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], {
+      type: "FeatureCollection", features: geographies,
+    });
+    const path = d3.geoPath().projection(projection);
+    const feature = geographies.find((d) => d.properties.name === selectedCounty);
+
+    d3.select(svgRef.current)
+      .select(".selected-layer")
+      .selectAll("path")
+      .data(feature ? [feature] : [])
+      .join(
+        (enter) =>
+          enter
+            .append("path")
+            .attr("fill", "none")
+            .attr("pointer-events", "none")
+            .attr("stroke", "#1a1a1a")
+            .attr("stroke-width", 1.25)
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("vector-effect", "non-scaling-stroke"),
+        (update) => update,
+        (exit) => exit.remove()
+      )
+      .attr("d", path);
+  }, [geographies, selectedCounty, scenarioKey]);
 
   function buildExportSVG() {
     const src = svgRef.current;
