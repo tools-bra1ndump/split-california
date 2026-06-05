@@ -28,7 +28,7 @@ const SCENARIOS = {
       east: {
         label: "East California",
         color: "#1B9AAA",
-        capital: { name: "Sacramento", coords: [-121.494, 38.582] },
+        capital: { name: "Monterey", coords: [-121.895, 36.600] },
         counties: [
           "Marin", "Contra Costa", "San Francisco", "San Mateo", "Alameda",
           "Santa Clara", "Santa Cruz", "San Benito", "Monterey",
@@ -38,7 +38,7 @@ const SCENARIOS = {
       west: {
         label: "West California",
         color: "#F28C28",
-        capital: { name: "Monterey", coords: [-121.895, 36.600] },
+        capital: { name: "Sacramento", coords: [-121.494, 38.582] },
         counties: [
           "Sonoma", "Napa", "Yolo", "Solano", "Sacramento", "Amador", "Alpine",
           "San Joaquin", "Calaveras", "Tuolumne", "Stanislaus", "Mariposa", "Mono",
